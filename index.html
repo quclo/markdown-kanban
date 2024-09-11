@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Kanban</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: hsl(240, 20%, 95%);
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid hsl(0, 0%, 80%);
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+        }
+
+        button,
+        header input[type="file"],
+        header button {
+            padding: 5px 10px;
+            border: none;
+            background-color: hsl(207, 90%, 56%);
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover,
+        header button:hover,
+        header input[type="file"]:hover {
+            background-color: hsl(207, 90%, 46%);
+        }
+
+        .board,
+        .column,
+        .card {
+            background-color: hsl(0, 0%, 100%);
+            border: 1px solid hsl(0, 0%, 80%);
+            border-radius: 5px;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .board h2,
+        .column h3,
+        .card h4 {
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            font-size: 1rem;
+            border-bottom: 1px solid hsl(0, 0%, 80%);
+        }
+
+        pre,
+        textarea,
+        .board .details,
+        .column .details,
+        .card .details {
+            background-color: hsl(0, 0%, 97%);
+            padding: 5px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin-bottom: 10px;
+        }
+
+        .columns {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .column {
+            width: 25vw;
+            flex-shrink: 0;
+        }
+
+        .cards {
+            min-height: 50px;
+            background-color: hsl(0, 0%, 100%);
+            border-radius: 5px;
+            padding: 5px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .card {
+            cursor: grab;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .card:hover {
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        textarea {
+            resize: none;
+            height: 60px;
+            width: 100%;
+        }
+
+        .deleteBoard,
+        .deleteColumn,
+        .deleteCard {
+            background-color: hsl(0, 70%, 60%);
+            margin-left: 5px;
+        }
+
+        .deleteBoard:hover,
+        .deleteColumn:hover,
+        .deleteCard:hover {
+            background-color: hsl(0, 70%, 50%);
+        }
+
+        #addBoard {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: hsl(207, 90%, 56%);
+        }
+
+        #addBoard:hover {
+            background-color: hsl(207, 90%, 46%);
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Markdown Kanban</h1>
+        <div>
+            <input type="file" id="upload" accept=".md">
+            <button id="download">Download</button>
+        </div>
+    </header>
+
+    <div id="boards"></div>
+    <button id="addBoard">Add Board</button>
+
+    <script>
+        const GOLDEN_ANGLE = 137.50776405003785;
+        let draggedCard = null, currentBoard = null, currentColumn = null;
+        let currentMetadata = "", currentDetails = "";
+
+
+        const createElement = (html) => {
+            const div = document.createElement('div');
+            div.innerHTML = html.trim();
+            return div.firstChild;
+        };
+
+        const addBoard = (title = "New Board", metadata = "", description = "") => {
+            const board = createElement(`
+                <div class="board">
+                    <h2 contenteditable="true">${title}</h2>
+                    <pre contenteditable="true">${metadata}</pre>
+                    <p class="details" contenteditable="true">${description}</p>
+                    <div class="columns"></div>
+                    <button class="addColumn">Add Column</button>
+                    <button class="deleteBoard">Delete Board</button>
+                </div>
+            `);
+            board.querySelector(".addColumn").onclick = () => addColumn(board);
+            board.querySelector(".deleteBoard").onclick = () => board.remove();
+            document.getElementById("boards").appendChild(board);
+            currentBoard = board;
+        };
+
+        const addColumn = (board, title = "New Column", metadata = "", description = "") => {
+            const column = createElement(`
+                <div class="column" style="background: hsl(${board.querySelectorAll(".column").length * GOLDEN_ANGLE}, 100%, 90%)">
+                    <h3 contenteditable="true">${title}</h3>
+                    <pre contenteditable="true">${metadata}</pre>
+                    <p class="details" contenteditable="true">${description}</p>
+                    <div class="cards"></div>
+                    <button class="addCard">Add Card</button>
+                    <button class="deleteColumn">Delete Column</button>
+                </div>
+            `);
+            column.querySelector(".addCard").onclick = () => addCard(column);
+            column.querySelector(".deleteColumn").onclick = () => column.remove();
+            column.querySelector(".cards").ondragover = (e) => e.preventDefault();
+            column.querySelector(".cards").ondrop = (e) => e.target.closest(".cards").appendChild(draggedCard);
+            board.querySelector(".columns").appendChild(column);
+            currentColumn = column;
+        };
+
+        const addCard = (column, title = "New Card", metadata = "", description = "") => {
+            const card = createElement(`
+                <div class="card" draggable="true">
+                    <h4 contenteditable="true">${title}</h4>
+                    <pre contenteditable="true">${metadata}</pre>
+                    <textarea class="details" contenteditable="true">${description}</textarea>
+                    <button class="deleteCard">Delete Card</button>
+                </div>
+            `);
+            card.querySelector(".deleteCard").onclick = () => card.remove();
+            card.ondragstart = () => draggedCard = card;
+            card.ondragend = () => draggedCard = null;
+            column.querySelector(".cards").appendChild(card);
+        };
+
+        const parseMarkdown = (markdown) => {
+            const lines = markdown.split("\n");
+            let currentTitle = "", isBoard = false, isColumn = false, isCard = false;
+
+            const resetFlagsAndApply = () => {
+                if (isCard && currentColumn) addCard(currentColumn, currentTitle, currentMetadata, currentDetails);
+                else if (isColumn && currentBoard) addColumn(currentBoard, currentTitle, currentMetadata, currentDetails);
+                else if (isBoard) addBoard(currentTitle, currentMetadata, currentDetails);
+                currentMetadata = currentDetails = "";
+                isBoard = isColumn = isCard = false;
+            };
+
+            lines.forEach(line => {
+                if (line.startsWith("# ")) {
+                    resetFlagsAndApply();
+                    currentTitle = line.replace("# ", "").trim();
+                    isBoard = true;
+                } else if (line.startsWith("## ")) {
+                    resetFlagsAndApply();
+                    currentTitle = line.replace("## ", "").trim();
+                    isColumn = true;
+                } else if (line.startsWith("### ")) {
+                    resetFlagsAndApply();
+                    currentTitle = line.replace("### ", "").trim();
+                    isCard = true;
+                } else if (line.startsWith("> ")) {
+                    currentMetadata += line.replace("> ", "") + "\n";
+                } else if (line.trim() !== "") {
+                    currentDetails += line.trim() + "\n";
+                }
+            });
+
+            resetFlagsAndApply();
+        };
+
+        const generateMarkdown = () => {
+            let markdown = '';
+
+            document.querySelectorAll('.board').forEach(board => {
+                const boardTitle = board.querySelector('h2').innerText.trim();
+                const boardMetadata = board.querySelector('pre').innerText.trim();
+                const boardDetails = board.querySelector('.details').innerText.trim();
+
+                markdown += `# ${boardTitle}\n`;
+                if (boardMetadata) markdown += `> ${boardMetadata.replace(/\n/g, '\n> ')}\n`;
+                if (boardDetails) markdown += `${boardDetails}\n`;
+
+                board.querySelectorAll('.column').forEach(column => {
+                    const columnTitle = column.querySelector('h3').innerText.trim();
+                    const columnMetadata = column.querySelector('pre').innerText.trim();
+                    const columnDetails = column.querySelector('.details').innerText.trim();
+
+                    markdown += `## ${columnTitle}\n`;
+                    if (columnMetadata) markdown += `> ${columnMetadata.replace(/\n/g, '\n> ')}\n`;
+                    if (columnDetails) markdown += `${columnDetails}\n`;
+
+                    column.querySelectorAll('.card').forEach(card => {
+                        const cardTitle = card.querySelector('h4').innerText.trim();
+                        const cardMetadata = card.querySelector('pre').innerText.trim();
+                        const cardDetails = card.querySelector('.details').value.trim();
+
+                        markdown += `### ${cardTitle}\n`;
+                        if (cardMetadata) markdown += `> ${cardMetadata.replace(/\n/g, '\n> ')}\n`;
+                        if (cardDetails) markdown += `${cardDetails}\n`;
+                    });
+                });
+            });
+
+            return markdown;
+        };
+
+        const downloadMarkdown = () => {
+            const markdown = generateMarkdown();
+            const blob = new Blob([markdown], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'kanban_board.md';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+
+        document.getElementById("upload").onchange = (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                document.getElementById("boards").innerHTML = "";
+                const reader = new FileReader();
+                reader.onload = (e) => parseMarkdown(e.target.result);
+                reader.readAsText(file);
+            }
+        };
+
+        document.getElementById("addBoard").onclick = () => addBoard();
+        document.getElementById("download").onclick = downloadMarkdown;
+    </script>
+</body>
+
+</html>

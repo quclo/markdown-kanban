@@ -4,6 +4,16 @@
 
 This is the main Kanban board for the project.
 
+## Won't Do
+
+> hidden: true
+
+Features that won't be implemented
+
+### Useless Feature
+
+Details about Useless Feature implementation.
+
 ## To Do
 
 > limit: 5

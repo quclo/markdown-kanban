@@ -139,17 +139,12 @@
     <button id="addBoard">Add Board</button>
 
     <script>
-      /* -- Minimal, fully-featured Markdown Kanban, with Golden Angle columns -- */
-
       const GOLDEN_ANGLE = 137.50776405003785;
       let draggedCard = null,
         currentBoard = null,
         currentColumn = null;
-      let currentMetadata = "",
-        currentDetails = "";
       let SHOW_HIDDEN = false;
 
-      // DOM references
       const boardsDiv = document.getElementById("boards");
       const addBoardBtn = document.getElementById("addBoard");
       const uploadInput = document.getElementById("upload");
@@ -223,9 +218,8 @@
         desc = ""
       ) {
         const p = parseKeyValueLines(metadata);
-        // use the golden angle approach to color columns distinctly
         const colIndex = board.querySelectorAll(".column").length;
-        const hue = (colIndex * GOLDEN_ANGLE) % 360;
+        const hue = (colIndex * GOLDEN_ANGLE) % 360; // golden angle rotation
 
         const col = createElement(`
     <div class="column" data-hidden="${p.hidden}" data-limit="${p.limit}"
@@ -295,7 +289,9 @@
         boardsDiv.innerHTML = "";
         const lines = md.split("\n");
         let currentTitle = "",
-          isBoard = false,
+          currentMetadata = "",
+          currentDetails = "";
+        let isBoard = false,
           isColumn = false,
           isCard = false;
 
@@ -316,7 +312,8 @@
             );
           else if (isBoard)
             addBoard(currentTitle, currentMetadata, currentDetails);
-          currentMetadata = currentDetails = "";
+          currentMetadata = "";
+          currentDetails = "";
           isBoard = isColumn = isCard = false;
         }
 

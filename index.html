@@ -1,320 +1,477 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <link rel="icon" type="image/x-icon" href="https://quclo.com/public/quclo.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Markdown Kanban</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            background-color: hsl(240, 20%, 95%);
-            padding: 20px;
-            line-height: 1.5;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid hsl(0, 0%, 80%);
-        }
-
-        header h1 {
-            font-size: 1.5rem;
-        }
-
-        button,
-        header input[type="file"],
-        header button {
-            padding: 5px 10px;
-            border: none;
-            background-color: hsl(207, 90%, 56%);
-            color: white;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        button:hover,
-        header button:hover,
-        header input[type="file"]:hover {
-            background-color: hsl(207, 90%, 46%);
-        }
-
-        .board,
-        .column,
-        .card {
-            background-color: hsl(0, 0%, 100%);
-            border: 1px solid hsl(0, 0%, 80%);
-            border-radius: 5px;
-            padding: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-
-        .board h2,
-        .column h3,
-        .card h4 {
-            margin-bottom: 10px;
-            padding-bottom: 5px;
-            font-size: 1rem;
-            border-bottom: 1px solid hsl(0, 0%, 80%);
-        }
-
-        pre,
-        textarea,
-        .board .details,
-        .column .details,
-        .card .details {
-            background-color: hsl(0, 0%, 97%);
-            padding: 5px;
-            border-radius: 5px;
-            font-family: monospace;
-            margin-bottom: 10px;
-        }
-
-        .columns {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding-bottom: 10px;
-        }
-
-        .column {
-            width: 25vw;
-            flex-shrink: 0;
-        }
-
-        .cards {
-            min-height: 50px;
-            background-color: hsl(0, 0%, 100%);
-            border-radius: 5px;
-            padding: 5px;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .card {
-            cursor: grab;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .card:hover {
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
-        }
-
-        textarea {
-            resize: none;
-            height: 60px;
-            width: 100%;
-        }
-
-        .deleteBoard,
-        .deleteColumn,
-        .deleteCard {
-            background-color: hsl(0, 70%, 60%);
-            margin-left: 5px;
-        }
-
-        .deleteBoard:hover,
-        .deleteColumn:hover,
-        .deleteCard:hover {
-            background-color: hsl(0, 70%, 50%);
-        }
-
-        #addBoard {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: hsl(207, 90%, 56%);
-        }
-
-        #addBoard:hover {
-            background-color: hsl(207, 90%, 46%);
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: sans-serif;
+        padding: 20px;
+        background: #f4f4f9;
+        line-height: 1.4;
+      }
+      header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+      header h1 {
+        font-size: 1.3rem;
+      }
+      button,
+      input[type="file"] {
+        background: #3c8bdc;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 6px 10px;
+        cursor: pointer;
+      }
+      button:hover,
+      input[type="file"]:hover {
+        background: #286faf;
+      }
+      #search {
+        padding: 6px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+      }
+      #boards {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+      .board,
+      .column,
+      .card {
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 10px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+      .board h2,
+      .column h3,
+      .card h4 {
+        margin-bottom: 8px;
+        padding-bottom: 5px;
+        border-bottom: 1px solid #ddd;
+        font-size: 1rem;
+      }
+      .columns {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+      }
+      .column {
+        width: 240px;
+        flex-shrink: 0;
+      }
+      .cards {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-height: 50px;
+      }
+      pre,
+      .details,
+      textarea {
+        background: #fafafa;
+        padding: 5px;
+        border-radius: 3px;
+        font-family: monospace;
+        margin-bottom: 8px;
+      }
+      textarea {
+        width: 100%;
+        height: 50px;
+        resize: none;
+      }
+      .addColumn,
+      .addCard,
+      .deleteBoard,
+      .deleteColumn,
+      .deleteCard {
+        margin-right: 5px;
+        background: #dc3c3c;
+      }
+      .addColumn,
+      .addCard {
+        background: #3c8bdc;
+      }
+      .deleteBoard:hover,
+      .deleteColumn:hover,
+      .deleteCard:hover {
+        background: #a72c2c;
+      }
+      #addBoard {
+        margin-top: 15px;
+        background: #3c8bdc;
+      }
     </style>
-</head>
-
-<body>
+  </head>
+  <body>
     <header>
-        <h1>Markdown Kanban</h1>
-        <div>
-            <input type="file" id="upload" accept=".md">
-            <button id="download">Download</button>
-        </div>
+      <h1>Markdown Kanban</h1>
+      <input
+        id="search"
+        type="text"
+        placeholder="Search..."
+        oninput="searchKanban()"
+      />
+      <div>
+        <input id="upload" type="file" accept=".md" />
+        <button id="download">Download</button>
+        <button id="toggleHidden">Show Hidden Items</button>
+      </div>
     </header>
 
     <div id="boards"></div>
     <button id="addBoard">Add Board</button>
 
     <script>
-        const GOLDEN_ANGLE = 137.50776405003785;
-        let draggedCard = null, currentBoard = null, currentColumn = null;
-        let currentMetadata = "", currentDetails = "";
+      /* -- Minimal, fully-featured Markdown Kanban, with Golden Angle columns -- */
 
+      const GOLDEN_ANGLE = 137.50776405003785;
+      let draggedCard = null,
+        currentBoard = null,
+        currentColumn = null;
+      let currentMetadata = "",
+        currentDetails = "";
+      let SHOW_HIDDEN = false;
 
-        const createElement = (html) => {
-            const div = document.createElement('div');
-            div.innerHTML = html.trim();
-            return div.firstChild;
+      // DOM references
+      const boardsDiv = document.getElementById("boards");
+      const addBoardBtn = document.getElementById("addBoard");
+      const uploadInput = document.getElementById("upload");
+      const downloadBtn = document.getElementById("download");
+      const toggleBtn = document.getElementById("toggleHidden");
+      const searchInput = document.getElementById("search");
+
+      function createElement(html) {
+        const tmp = document.createElement("div");
+        tmp.innerHTML = html.trim();
+        return tmp.firstChild;
+      }
+
+      function parseKeyValueLines(text) {
+        let hidden = false,
+          limit = 0;
+        text.split("\n").forEach((line) => {
+          const low = line.trim().toLowerCase();
+          if (low.startsWith("hidden:"))
+            hidden = low.replace("hidden:", "").trim() === "true";
+          else if (low.startsWith("limit:")) {
+            const val = parseInt(low.replace("limit:", "").trim(), 10);
+            if (!isNaN(val)) limit = val;
+          }
+        });
+        return { hidden, limit, raw: text };
+      }
+
+      function applyHidden(el, isHidden) {
+        el.style.display = isHidden && !SHOW_HIDDEN ? "none" : "";
+      }
+
+      function checkColumnLimit(col) {
+        const lim = parseInt(col.dataset.limit || "0", 10);
+        if (lim <= 0) return true;
+        return col.querySelectorAll(".card").length < lim;
+      }
+
+      function addBoard(title = "New Board", metadata = "", desc = "") {
+        const p = parseKeyValueLines(metadata);
+        const board = createElement(`
+    <div class="board" data-hidden="${p.hidden}">
+      <h2 contenteditable="true">${title}</h2>
+      <pre contenteditable="true">${p.raw}</pre>
+      <p class="details" contenteditable="true">${desc}</p>
+      <div class="columns"></div>
+      <button class="addColumn">Add Column</button>
+      <button class="deleteBoard">Delete Board</button>
+    </div>
+  `);
+        boardsDiv.appendChild(board);
+        currentBoard = board;
+        applyHidden(board, p.hidden);
+
+        board.querySelector("pre").addEventListener("input", () => {
+          const txt = board.querySelector("pre").innerText;
+          const parsed = parseKeyValueLines(txt);
+          board.dataset.hidden = parsed.hidden;
+          applyHidden(board, parsed.hidden);
+          searchKanban();
+        });
+
+        board.querySelector(".addColumn").onclick = () => addColumn(board);
+        board.querySelector(".deleteBoard").onclick = () => board.remove();
+      }
+
+      function addColumn(
+        board,
+        title = "New Column",
+        metadata = "",
+        desc = ""
+      ) {
+        const p = parseKeyValueLines(metadata);
+        // use the golden angle approach to color columns distinctly
+        const colIndex = board.querySelectorAll(".column").length;
+        const hue = (colIndex * GOLDEN_ANGLE) % 360;
+
+        const col = createElement(`
+    <div class="column" data-hidden="${p.hidden}" data-limit="${p.limit}"
+         style="background: hsl(${hue}, 80%, 90%)">
+      <h3 contenteditable="true">${title}</h3>
+      <pre contenteditable="true">${p.raw}</pre>
+      <p class="details" contenteditable="true">${desc}</p>
+      <div class="cards"></div>
+      <button class="addCard">Add Card</button>
+      <button class="deleteColumn">Delete Column</button>
+    </div>
+  `);
+        board.querySelector(".columns").appendChild(col);
+        currentColumn = col;
+        applyHidden(col, p.hidden);
+
+        col.querySelector("pre").addEventListener("input", () => {
+          const txt = col.querySelector("pre").innerText;
+          const parsed = parseKeyValueLines(txt);
+          col.dataset.hidden = parsed.hidden;
+          col.dataset.limit = parsed.limit;
+          applyHidden(col, parsed.hidden);
+          searchKanban();
+        });
+
+        col.querySelector(".addCard").onclick = () => {
+          if (checkColumnLimit(col)) addCard(col);
+          else alert(`This column has a WIP limit of ${col.dataset.limit}.`);
         };
+        col.querySelector(".deleteColumn").onclick = () => col.remove();
 
-        const addBoard = (title = "New Board", metadata = "", description = "") => {
-            const board = createElement(`
-                <div class="board">
-                    <h2 contenteditable="true">${title}</h2>
-                    <pre contenteditable="true">${metadata}</pre>
-                    <p class="details" contenteditable="true">${description}</p>
-                    <div class="columns"></div>
-                    <button class="addColumn">Add Column</button>
-                    <button class="deleteBoard">Delete Board</button>
-                </div>
-            `);
-            board.querySelector(".addColumn").onclick = () => addColumn(board);
-            board.querySelector(".deleteBoard").onclick = () => board.remove();
-            document.getElementById("boards").appendChild(board);
-            currentBoard = board;
+        const cardsDiv = col.querySelector(".cards");
+        cardsDiv.ondragover = (e) => e.preventDefault();
+        cardsDiv.ondrop = (e) => {
+          e.preventDefault();
+          if (checkColumnLimit(col)) cardsDiv.appendChild(draggedCard);
+          else alert(`Column limit of ${col.dataset.limit} reached.`);
         };
+      }
 
-        const addColumn = (board, title = "New Column", metadata = "", description = "") => {
-            const column = createElement(`
-                <div class="column" style="background: hsl(${board.querySelectorAll(".column").length * GOLDEN_ANGLE}, 100%, 90%)">
-                    <h3 contenteditable="true">${title}</h3>
-                    <pre contenteditable="true">${metadata}</pre>
-                    <p class="details" contenteditable="true">${description}</p>
-                    <div class="cards"></div>
-                    <button class="addCard">Add Card</button>
-                    <button class="deleteColumn">Delete Column</button>
-                </div>
-            `);
-            column.querySelector(".addCard").onclick = () => addCard(column);
-            column.querySelector(".deleteColumn").onclick = () => column.remove();
-            column.querySelector(".cards").ondragover = (e) => e.preventDefault();
-            column.querySelector(".cards").ondrop = (e) => e.target.closest(".cards").appendChild(draggedCard);
-            board.querySelector(".columns").appendChild(column);
-            currentColumn = column;
-        };
+      function addCard(col, title = "New Card", metadata = "", desc = "") {
+        const p = parseKeyValueLines(metadata);
+        const card = createElement(`
+    <div class="card" draggable="true" data-hidden="${p.hidden}">
+      <h4 contenteditable="true">${title}</h4>
+      <pre contenteditable="true">${p.raw}</pre>
+      <textarea class="details">${desc}</textarea>
+      <button class="deleteCard">Delete Card</button>
+    </div>
+  `);
+        col.querySelector(".cards").appendChild(card);
+        applyHidden(card, p.hidden);
 
-        const addCard = (column, title = "New Card", metadata = "", description = "") => {
-            const card = createElement(`
-                <div class="card" draggable="true">
-                    <h4 contenteditable="true">${title}</h4>
-                    <pre contenteditable="true">${metadata}</pre>
-                    <textarea class="details" contenteditable="true">${description}</textarea>
-                    <button class="deleteCard">Delete Card</button>
-                </div>
-            `);
-            card.querySelector(".deleteCard").onclick = () => card.remove();
-            card.ondragstart = () => draggedCard = card;
-            card.ondragend = () => draggedCard = null;
-            column.querySelector(".cards").appendChild(card);
-        };
+        card.querySelector("pre").addEventListener("input", () => {
+          const txt = card.querySelector("pre").innerText;
+          const parsed = parseKeyValueLines(txt);
+          card.dataset.hidden = parsed.hidden;
+          applyHidden(card, parsed.hidden);
+          searchKanban();
+        });
+        card.querySelector(".deleteCard").onclick = () => card.remove();
+        card.ondragstart = () => (draggedCard = card);
+        card.ondragend = () => (draggedCard = null);
+      }
 
-        const parseMarkdown = (markdown) => {
-            const lines = markdown.split("\n");
-            let currentTitle = "", isBoard = false, isColumn = false, isCard = false;
+      function parseMarkdown(md) {
+        boardsDiv.innerHTML = "";
+        const lines = md.split("\n");
+        let currentTitle = "",
+          isBoard = false,
+          isColumn = false,
+          isCard = false;
 
-            const resetFlagsAndApply = () => {
-                if (isCard && currentColumn) addCard(currentColumn, currentTitle, currentMetadata, currentDetails);
-                else if (isColumn && currentBoard) addColumn(currentBoard, currentTitle, currentMetadata, currentDetails);
-                else if (isBoard) addBoard(currentTitle, currentMetadata, currentDetails);
-                currentMetadata = currentDetails = "";
-                isBoard = isColumn = isCard = false;
-            };
+        function commit() {
+          if (isCard && currentColumn)
+            addCard(
+              currentColumn,
+              currentTitle,
+              currentMetadata,
+              currentDetails
+            );
+          else if (isColumn && currentBoard)
+            addColumn(
+              currentBoard,
+              currentTitle,
+              currentMetadata,
+              currentDetails
+            );
+          else if (isBoard)
+            addBoard(currentTitle, currentMetadata, currentDetails);
+          currentMetadata = currentDetails = "";
+          isBoard = isColumn = isCard = false;
+        }
 
-            lines.forEach(line => {
-                if (line.startsWith("# ")) {
-                    resetFlagsAndApply();
-                    currentTitle = line.replace("# ", "").trim();
-                    isBoard = true;
-                } else if (line.startsWith("## ")) {
-                    resetFlagsAndApply();
-                    currentTitle = line.replace("## ", "").trim();
-                    isColumn = true;
-                } else if (line.startsWith("### ")) {
-                    resetFlagsAndApply();
-                    currentTitle = line.replace("### ", "").trim();
-                    isCard = true;
-                } else if (line.startsWith("> ")) {
-                    currentMetadata += line.replace("> ", "") + "\n";
-                } else if (line.trim() !== "") {
-                    currentDetails += line.trim() + "\n";
-                }
+        for (const line of lines) {
+          if (line.startsWith("# ")) {
+            commit();
+            currentTitle = line.slice(2).trim();
+            isBoard = true;
+          } else if (line.startsWith("## ")) {
+            commit();
+            currentTitle = line.slice(3).trim();
+            isColumn = true;
+          } else if (line.startsWith("### ")) {
+            commit();
+            currentTitle = line.slice(4).trim();
+            isCard = true;
+          } else if (line.startsWith("> ")) {
+            currentMetadata += line.slice(2) + "\n";
+          } else if (line.trim()) {
+            currentDetails += line.trim() + "\n";
+          }
+        }
+        commit();
+      }
+
+      function generateMarkdown() {
+        let out = "";
+        boardsDiv.querySelectorAll(".board").forEach((board) => {
+          const bt = board.querySelector("h2").innerText.trim();
+          const bm = board.querySelector("pre").innerText.trim();
+          const bd = board.querySelector(".details").innerText.trim();
+          out += `# ${bt}\n`;
+          if (bm) out += `> ${bm.replace(/\n/g, "\n> ")}\n`;
+          if (bd) out += bd + "\n";
+
+          board.querySelectorAll(".column").forEach((col) => {
+            const ct = col.querySelector("h3").innerText.trim();
+            const cm = col.querySelector("pre").innerText.trim();
+            const cd = col.querySelector(".details").innerText.trim();
+            out += `## ${ct}\n`;
+            if (cm) out += `> ${cm.replace(/\n/g, "\n> ")}\n`;
+            if (cd) out += cd + "\n";
+
+            col.querySelectorAll(".card").forEach((card) => {
+              const title = card.querySelector("h4").innerText.trim();
+              const meta = card.querySelector("pre").innerText.trim();
+              const det = card.querySelector(".details").value.trim();
+              out += `### ${title}\n`;
+              if (meta) out += `> ${meta.replace(/\n/g, "\n> ")}\n`;
+              if (det) out += det + "\n";
             });
+          });
+        });
+        return out;
+      }
 
-            resetFlagsAndApply();
-        };
+      function searchKanban() {
+        const q = searchInput.value.toLowerCase();
+        boardsDiv.querySelectorAll(".board").forEach((board) => {
+          const bh = board.dataset.hidden === "true";
+          if (bh && !SHOW_HIDDEN) {
+            board.style.display = "none";
+            return;
+          }
+          const bt = board.querySelector("h2").innerText.toLowerCase();
+          const bm = board.querySelector("pre").innerText.toLowerCase();
+          const bd = board.querySelector(".details").innerText.toLowerCase();
+          let boardMatches =
+            bt.includes(q) || bm.includes(q) || bd.includes(q) || !q;
+          let anyColVisible = false;
 
-        const generateMarkdown = () => {
-            let markdown = '';
-
-            document.querySelectorAll('.board').forEach(board => {
-                const boardTitle = board.querySelector('h2').innerText.trim();
-                const boardMetadata = board.querySelector('pre').innerText.trim();
-                const boardDetails = board.querySelector('.details').innerText.trim();
-
-                markdown += `# ${boardTitle}\n`;
-                if (boardMetadata) markdown += `> ${boardMetadata.replace(/\n/g, '\n> ')}\n`;
-                if (boardDetails) markdown += `${boardDetails}\n`;
-
-                board.querySelectorAll('.column').forEach(column => {
-                    const columnTitle = column.querySelector('h3').innerText.trim();
-                    const columnMetadata = column.querySelector('pre').innerText.trim();
-                    const columnDetails = column.querySelector('.details').innerText.trim();
-
-                    markdown += `## ${columnTitle}\n`;
-                    if (columnMetadata) markdown += `> ${columnMetadata.replace(/\n/g, '\n> ')}\n`;
-                    if (columnDetails) markdown += `${columnDetails}\n`;
-
-                    column.querySelectorAll('.card').forEach(card => {
-                        const cardTitle = card.querySelector('h4').innerText.trim();
-                        const cardMetadata = card.querySelector('pre').innerText.trim();
-                        const cardDetails = card.querySelector('.details').value.trim();
-
-                        markdown += `### ${cardTitle}\n`;
-                        if (cardMetadata) markdown += `> ${cardMetadata.replace(/\n/g, '\n> ')}\n`;
-                        if (cardDetails) markdown += `${cardDetails}\n`;
-                    });
-                });
-            });
-
-            return markdown;
-        };
-
-        const downloadMarkdown = () => {
-            const markdown = generateMarkdown();
-            const blob = new Blob([markdown], { type: 'text/markdown' });
-            const url = URL.createObjectURL(blob);
-
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'kanban_board.md';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        };
-
-        document.getElementById("upload").onchange = (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                document.getElementById("boards").innerHTML = "";
-                const reader = new FileReader();
-                reader.onload = (e) => parseMarkdown(e.target.result);
-                reader.readAsText(file);
+          board.querySelectorAll(".column").forEach((col) => {
+            const ch = col.dataset.hidden === "true";
+            if (ch && !SHOW_HIDDEN) {
+              col.style.display = "none";
+              return;
             }
+            const ct = col.querySelector("h3").innerText.toLowerCase();
+            const cm = col.querySelector("pre").innerText.toLowerCase();
+            const cd = col.querySelector(".details").innerText.toLowerCase();
+            let colMatches =
+              ct.includes(q) || cm.includes(q) || cd.includes(q) || !q;
+            let anyCardVisible = false;
+
+            col.querySelectorAll(".card").forEach((card) => {
+              const h = card.dataset.hidden === "true";
+              if (h && !SHOW_HIDDEN) {
+                card.style.display = "none";
+                return;
+              }
+              const cTitle = card.querySelector("h4").innerText.toLowerCase();
+              const cMeta = card.querySelector("pre").innerText.toLowerCase();
+              const cDet = card.querySelector(".details").value.toLowerCase();
+              let cardMatches =
+                cTitle.includes(q) ||
+                cMeta.includes(q) ||
+                cDet.includes(q) ||
+                !q;
+              card.style.display =
+                cardMatches && !(h && !SHOW_HIDDEN) ? "" : "none";
+              if (card.style.display !== "none") anyCardVisible = true;
+            });
+
+            col.style.display =
+              (colMatches || anyCardVisible) && !(ch && !SHOW_HIDDEN)
+                ? ""
+                : "none";
+            if (col.style.display !== "none") anyColVisible = true;
+          });
+
+          board.style.display =
+            (boardMatches || anyColVisible) && !(bh && !SHOW_HIDDEN)
+              ? ""
+              : "none";
+        });
+      }
+
+      function downloadMarkdown() {
+        const md = generateMarkdown();
+        const blob = new Blob([md], { type: "text/markdown" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "kanban_board.md";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
+      window.addEventListener("DOMContentLoaded", () => {
+        const last = localStorage.getItem("lastMarkdown");
+        if (last) parseMarkdown(last);
+      });
+
+      uploadInput.addEventListener("change", (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        const r = new FileReader();
+        r.onload = (ev) => {
+          parseMarkdown(ev.target.result);
+          localStorage.setItem("lastMarkdown", ev.target.result);
         };
+        r.readAsText(f);
+      });
 
-        document.getElementById("addBoard").onclick = () => addBoard();
-        document.getElementById("download").onclick = downloadMarkdown;
+      addBoardBtn.onclick = () => addBoard();
+      downloadBtn.onclick = () => downloadMarkdown();
+      toggleBtn.onclick = () => {
+        SHOW_HIDDEN = !SHOW_HIDDEN;
+        toggleBtn.innerText = SHOW_HIDDEN
+          ? "Hide Hidden Items"
+          : "Show Hidden Items";
+        searchKanban();
+      };
     </script>
-</body>
-
+  </body>
 </html>
